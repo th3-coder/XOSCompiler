@@ -1,0 +1,35 @@
+#config.txt
+# save config file <projName>_CrossX for later use
+# 1 config file per project
+
+#Server: 1
+
+# Host Options
+PROJECT_NAME: crossOS_compiler
+HOST_DRIVE: C
+PRIVATE_KEY: \Users\haydo\.ssh\id_ed25519
+LOUD: 1
+
+# SSH / SCP Options
+SCP_QUIET: 1
+SSH_KEY: 1
+
+# X11 Forwarding Options
+WSL_X11: 0
+SRVX_X11: 1
+
+# Compiler Configurations
+#LANGUAGE: C
+COMPILER: g++
+#OUTPUT_EXTENSION: .exe/.out/<blank> 
+
+# Remote Options
+#OS: Linux
+OUTPUT_DIRECTORY: ~/Desktop/crossx
+MACHINE_NAME: th3-linux
+USERNAME: th3
+HOST_IP: 192.168.0.220
+PORT: 22
+
+#Server-End
+
