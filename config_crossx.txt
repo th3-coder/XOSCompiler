@@ -2,34 +2,53 @@
 # save config file <projName>_CrossX for later use
 # 1 config file per project
 
-#Server: 1
+#DEPENDECIES-REMOTE (create install script for core materials | Each OS)
+    # openssh-server, 
+    # cmake,
+    # GCC,
+    # G++,
+    # python,
+    # pip,
+    # wsl (optional), VCXSRV (optional)
+#DEPENDECIES-HOST (create install script for core materials | Each OS)
+    # powershell
+    # openssh-client
 
 # Host Options
+# PROJECT_NAME MUST BE LOCAL DIR NAME !!! UPDATE
 PROJECT_NAME: crossOS_compiler
+PROJECTS_DIR: \Users\haydo\Desktop\Home_Server\crossOS_compiler\
+#HOST_OS: Windows
+# CONFIG_PATH IS RELATIVE TO PROJECT_DIR (if left empty then in root project directory)
+#CONFIG_PATH: 
+
 HOST_DRIVE: C
 PRIVATE_KEY: \Users\haydo\.ssh\id_ed25519
 LOUD: 1
 
-# SSH / SCP Options
-SCP_QUIET: 1
-SSH_KEY: 1
-
-# X11 Forwarding Options
-WSL_X11: 0
-SRVX_X11: 1
-
-# Compiler Configurations
-#LANGUAGE: C
-COMPILER: g++
-#OUTPUT_EXTENSION: .exe/.out/<blank> 
-
 # Remote Options
-#OS: Linux
+#REMOTE_OS: Linux
 OUTPUT_DIRECTORY: ~/Desktop/crossx
 MACHINE_NAME: th3-linux
 USERNAME: th3
 HOST_IP: 192.168.0.220
 PORT: 22
+
+# SSH / SCP Options
+SCP_QUIET: 1
+SSH_KEY: 1
+#RSYNC: 0
+
+# X11 Forwarding Options
+WSL_X11: 0
+SRVX_X11: 0
+#X11Forwading: 0
+
+# Compiler Configurations
+#LANGUAGE: C
+COMPILER: g++
+#PATH_TO_VENV
+#OUTPUT_EXTENSION: .exe/.out/<blank> 
 
 #Server-End
 

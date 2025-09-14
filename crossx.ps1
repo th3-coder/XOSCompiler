@@ -6,6 +6,10 @@
 
 # powershell one-line command:
 # powershell -ExecutionPolicy bypass -command "./crossx.ps1 -inputFile filterImg.cpp -compiler cmake"
+
+# Create an executable to run initial .ps1 script and pass all parameters (inputFile, compiler, wd, X11, ...)
+# currently in src folder 
+
 param
 (
     $config = "$(Get-Location)\config_crossx.txt",
@@ -14,7 +18,10 @@ param
     $compiler,
     $wd = (Get-Location),
     [int]$wsl_gui = 0,
-    [int]$srvx_gui = 0
+    [int]$srvx_gui = 0,
+    [int]$X11,
+    [string]$venv,
+    [string[]]$libs = @()
 )
 
 class host_machine{
@@ -23,9 +30,11 @@ class host_machine{
     $drive = "C:"
     $key = ('C:\Users\{0}\.ssh\id_ed25519' -f $this.user)
     [string]$ProjectName
+    [string]$OS = "Windows"
 
     [void]outputInfo(){
         Write-Host "------------------- Host --------------------"
+        Write-Host ('OS: {0}' -f $this.OS)
         Write-Host ('Project-Name: {0}' -f $this.ProjectName)
         Write-Host ('Project-Dir: {0}' -f $this.proj_dir)
         Write-Host ('Private Key: {0}' -f $this.key)
@@ -33,9 +42,7 @@ class host_machine{
     }
 }
 
-
-
-class client_machine
+ class client_machine
 {
     $user
     $ip
@@ -43,11 +50,13 @@ class client_machine
     $lang = "C"
     $output_dir
     $name = "Client Machine"
+    [string]$OS = "Linux"
     [string]$compiler
 
     #class functions
     [void]outputInfo() {
         Write-Host "----------------- Remote -------------------"
+        Write-Host ('OS: {0}' -f $this.OS)
         Write-Host ('Machine name: {0}' -f $this.name)
         Write-Host ('User: {0}' -f $this.user)
         Write-Host ('Machine IP: {0}' -f $this.ip)
@@ -71,14 +80,15 @@ class sshConfig{
     # chmod 700 - .ssh folder
     [int]$wsl_X11 = 0
     [int]$srvx_X11 = 0
+    [int]$X11 = 0
     [string]$configSettings
     [string]$ssh_cmd
     [string]$scp_cmd
 
     [void]SSH_SEND_CMD([client_machine]$client, [host_machine]$hostX){
         $this.ssh_cmd = "ssh"
-        if( $this.wsl_X11 -eq 1) {
-            $this.configSettings = ('{0} -Y' -f $this.ssh_cmd)     
+        if( $this.wsl_X11 -eq 1 -or $this.srvx_X11 -eq 1 -or $this.X11 -eq 1) {
+            $this.configSettings = ('{0} -Y' -f $this.ssh_cmd)
             #Write-Host $ssh.configSettings
         }
         if($client.port -ne 22){
@@ -105,12 +115,13 @@ class sshConfig{
     $this.scp_cmd = ('{0} {1} {2}@{3}:''{4}/''' -f $this.configSettings, $hostX.proj_dir, $client.user, $client.ip, $client.output_dir)
 }
 
-    [void]displayConfig(){
+    [void]displayConfig([int]$X11){
         Write-Host "--------------- ssh config ------------------"
         Write-Host ('Quiet Mode: {0}' -f $this.quiet)
         Write-Host ('Using private key: {0}' -f $this.key)
         Write-Host ('WSL_X11 Forwarding: {0}' -f $this.wsl_X11)
         Write-Host ('SRVX_X11 Forwarding: {0}' -f $this.srvx_X11)
+        Write-Host ('X11Forwarding: {0}' -f $X11)
         Write-Host "---------------------------------------------"
     }
 }
@@ -134,8 +145,9 @@ function setVariables {
         if ( $currentLine.Contains("#") ){
             continue
         }
-        # elseif (!$currentLine.Contains(":")) {
-        #     continue
+        # elseif (-not $currentLine.Contains(":")) {
+        #    Write-Host "Error in config file, exiting"
+        #    Exit
         # }
 
         $lineContent = $currentLine -split ":"
@@ -169,6 +181,10 @@ function setVariables {
             $client.compiler = $lineContent[1].Trim()
             #Write-Host $client.output_dir
         }
+        elseif ($lineContent[0] -eq "REMOTE_OS"){
+            $client.OS = $lineContent[1].Trim()
+            #Write-Host $client.output_dir
+        }
         elseif ($lineContent[0] -eq "WSL_X11"){
             $ssh.wsl_X11 = [int]$lineContent[1]
             #Write-Host $client.output_dir
@@ -189,7 +205,11 @@ function setVariables {
         }
         elseif($lineContent[0] -eq "PROJECT_NAME"){
             $hostX.ProjectName = ($lineContent[1]).Trim()
-            Write-Host $hostX.ProjectName
+            #Write-Host $hostX.ProjectName
+        }
+        elseif($lineContent[0] -eq "HOST_OS"){
+            $hostX.OS = ($lineContent[1]).Trim()
+            #Write-Host $hostX.OS
         }
 
         #scp config
@@ -217,13 +237,18 @@ function setVariables {
     if($wsl_gui -ne 0){
         $ssh.wsl_X11 = $wsl_gui
     }
+    if( $hostX.OS -ne "Windows"){
+        $ssh.wsl_X11 = 0
+        $ssh.srvx_X11 = 0
+        $ssh.X11 = $X11
+    }
     elseif($srvx_gui -ne 0){
         $ssh.srvx_X11 = $srvx_gui
     }
 
     $client.outputInfo()
     $hostX.outputInfo()
-    $ssh.displayConfig()
+    $ssh.displayConfig($X11)
 }
 
 #main function

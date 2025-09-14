@@ -2,19 +2,25 @@
 class admin {
     [string]$command
     [int]$running = 0
+    [int]$background = 0
+    [bool]$remotePathExists = $false
+    [int]$remoteCheck = 0
 }
 class compileConfig {
     [string]$lang
+    [string]$hostDir
     [string]$inputFile
     [string]$output_file
     [string]$localOut
     [string]$outDir
     [string]$ProjectName
     [string]$compiler
-    [string]$libraries = @()
-    [string]$includes = @()
+    [string[]]$libraries = @()
+    [string[]]$includes = @()
     [string[]]$compile_cmds = @()
-    [string]$run 
+    [string]$run
+    [string]$venv_path
+    [string]$pyDependecies
 
     [void]GetInputFile([string] $inputFile, [string] $wd){
         $this.inputFile = $inputFile
@@ -92,8 +98,7 @@ class compileConfig {
         $content | Set-Content -Path $cmake_path
     }
 
-
-    [void]compile_Buffer([string]$client_wd, [string]$inputFile) {
+    [void]compile_Buffer([string]$client_wd, [string]$inputFile, [string]$remoteOS, [admin]$admin) {
         # $compile.output_file = ('{0}/{1}' -f $client.output_dir, $inputFile)
         if( $this.lang -eq "C" -or $this.lang -eq "C++"){
             class c_config{
@@ -131,6 +136,34 @@ class compileConfig {
         }
         elseif ($this.lang -eq "Py"){
             $this.run = ('python {0}' -f $this.inputFile)
+            if($this.venv_path.Length -ne 0) {
+                $this.python_venv_setup($admin, $client_wd, $remoteOS)
+            }
+        }
+    }
+
+    [void]python_venv_setup([admin]$admin, [string]$remote_wd, [string]$remoteOS){
+        $admin.background = 1
+        #$admin.command = "python3 -m venv $($remote_wd)/$($this.venv_path)"
+        checkRemotePath -remotePath "~/$($this.venv_path)"
+        if( -not $admin.remotePathExists){
+            $admin.command = "python3 -m venv ~/$($this.venv_path)"
+            runSSH
+        }
+        
+        $admin.background = 0
+        if((Test-Path "$($this.hostDir)/requirements.txt")){
+            #$admin.command = "source $($remote_wd)/$($this.venv_path)/bin/activate && pip install -r $($remote_wd)/$($this.ProjectName)/requirements.txt"
+            $admin.command = "source ~/$($this.venv_path)/bin/activate && pip install -r $($remote_wd)/$($this.ProjectName)/requirements.txt"
+            runSSH
+        }
+        
+        if($remoteOS -eq "Linux"){
+            #$this.run = "source $($remote_wd)/$($this.venv_path)/bin/activate && $($this.run)"
+            $this.run = "source ~/$($this.venv_path)/bin/activate && $($this.run)"
+        }   
+        elseif($remoteOS -eq "Windows"){
+            $this.run = ".$($this.venv_path)\Scripts\activate && $($this.run)"
         }
     }
 
@@ -155,7 +188,6 @@ class compileConfig {
         }
         Write-Host "------------------------"
     }
-
 }
 
 $compile = [compileConfig]::new()
@@ -167,25 +199,40 @@ function cleanPaths {
         #replace key file with wsl/ubuntu style/location key file
         $admin.command = $admin.command -replace $pattern, '~/.ssh/id_ed25519'
     }
-
 }
 function cleanDirectory {
     #fix remote directory
-    $admin.command = ('rm -rf {0}' -f $client.output_dir)
-    runSSH
-    $admin.command = ('mkdir {0}' -f $client.output_dir)
-    runSSH
+    checkRemotePath -remotePath "$($client.output_dir)/$($compile.ProjectName)"
+    if( $admin.remotePathExists ){
+        $admin.command = ('rm -rf {0}/{1}' -f $client.output_dir, $compile.ProjectName)
+        runSSH
+    }
+    checkRemotePath -remotePath $client.output_dir
+    if( -not $admin.remotePathExists) {
+        $admin.command = ('mkdir {0}' -f $client.output_dir)
+        runSSH
+    }
+    else {
+        Write-Host "Project directory already created"
+    }
+    checkRemotePath -remotePath "$($client.output_dir)/$($compile.ProjectName)"
     #create output directory
-    $admin.command = ('mkdir {0}/{1}' -f $client.output_dir, $compile.ProjectName)
-    runSSH
+    if( -not $admin.remotePathExists ) {
+        $admin.command = ('mkdir {0}/{1}' -f $client.output_dir, $compile.ProjectName)
+        runSSH
+    }
     $admin.command = ('mkdir {0}/{1}/build' -f $client.output_dir, $compile.ProjectName)
     runSSH
     # send files
     Write-Host ('Transferring files: {0}' -f $ssh.scp_cmd)
     Invoke-Expression $ssh.scp_cmd
-    $admin.command = ('mv {0}/{1}/resources/* {0}/{1}/build' -f $client.output_dir, $compile.ProjectName)
-    runSSH
+    
+    if (Test-Path "$($compile.hostDir)\resources" ){
+        $admin.command = ('mv {0}/{1}/resources/* {0}/{1}/build' -f $client.output_dir, $compile.ProjectName)
+        runSSH
+    }
 }
+# old unused function
 function createRunScript {
     $Path_Run_Script = "run.sh"
     [string[]]$runScript = @()
@@ -206,6 +253,7 @@ function run_Program {
         $admin.command = $compile.run
         $admin.running = 1
         runSSH
+        $admin.running = 0
         Write-Host "-----------------------"
     }
     else{
@@ -220,10 +268,11 @@ function start_wsl_x11 {
     $admin.command = $admin.command -replace "ssh ", "ssh -Y -t "
     $admin.command = ('wsl sh -c "{0}"' -f $admin.command)
 }
-
 function start_srvx_x11 {
-    Start-Process "resources\srvx_X11.xlaunch"
-    set DISPLAY=localhost:0.0
+    $Path_srvx = "resources\srvx_X11.xlaunch"
+    taskkill /IM "vcxsrv.exe" /F
+    Start-Process $Path_srvx
+    $Env:DISPLAY="localhost:0.0"
     $admin.command = $admin.command -replace "ssh ", "ssh -Y -t "
 }
 function runSSH {
@@ -234,6 +283,12 @@ function runSSH {
     
     $admin.command = ('{0} ''{1}''' -f $ssh.ssh_cmd, $admin.command) 
     
+    if( $admin.background -eq 1){
+        $admin.command = $admin.command -replace "ssh ", "ssh -t "
+    }
+    if( $admin.remoteCheck -eq 1){
+        $admin.command = "$($admin.command) 2>$\null"
+    }
     if( $admin.running -eq 1 ) {       
         if($ssh.wsl_X11 -eq 1){
             start_wsl_x11
@@ -242,34 +297,68 @@ function runSSH {
             start_srvx_x11
         }
     }
-    
-
     Write-Host ('Running SSH: {0}' -f $admin.command) 
     Invoke-Expression $admin.command
-    $admin.running = 0
 }
-
+function Cleanup {
+    Write-Host "Cleaning up proccesses"
+    if ($ssh.wsl_X11 -ne 0){
+        wsl --shutdown
+    }
+    elseif( $ssh.srvx_X11 -ne 0){
+        taskkill /IM "vcxsrv.exe" /F
+    }
+}
 function RunProcces {
-    createRunScript
-    cleanDirectory # prepare remote preoject directory    
+    #createRunScript
+    cleanDirectory # prepare remote preoject directory
+    $compile.compile_Buffer($client.output_dir, $inputFile, $client.OS, $admin)
+    $compile.outputInfo()    
     $compile.COMPILE_CMD($admin) #compile project
     run_Program #run output file
+    Cleanup
+}
+function checkRemotePath {
+    param
+    (
+        [string]$remotePath
+
+    )
+    $admin.remoteCheck = 1
+    $admin.remotePathExists=$false
+    try{
+        $admin.command = "stat $($remotePath)"
+        runSSH
+        if($LASTEXITCODE -eq 0){
+            $admin.remotePathExists = $true
+        }
+    }
+    catch{
+        $admin.remoteCheck = 0    
+    }
+    $admin.remoteCheck = 0
 }
 
-$compile.ProjectName = $hostX.ProjectName
-$compile.compiler = $client.compiler
-$compile.GetInputFile($inputFile, $client.output_dir)
-$compile.lang = $client.lang
-$compile.GetOutputFile($inputFile, $client.output_dir)
-$client.lang = $compile.lang
+function GetConfigData {
+    # order of operations are important in this function
+    if( $venv.Length -ne 0 ){
+        $compile.venv_path = $venv
+    }
+    $compile.hostDir = $hostX.proj_dir
+    $compile.ProjectName = $hostX.ProjectName
+    $compile.compiler = $client.compiler
+    $compile.GetInputFile($inputFile, $client.output_dir)
+    $compile.lang = $client.lang
+    $compile.GetOutputFile($inputFile, $client.output_dir)
+    $client.lang = $compile.lang
 
-if($compile.lang -eq "Py"){
-    $compile.compiler = "None"
-    $client.compiler = "None"
+    if($compile.lang -eq "Py"){
+        $compile.compiler = "None"
+        $client.compiler = "None"
+    }
 }
 
-$compile.compile_Buffer($client.output_dir, $inputFile)
-
-$compile.outputInfo()
+# main function
+GetConfigData
 
 RunProcces
