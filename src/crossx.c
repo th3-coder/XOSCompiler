@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "Shlwapi.h"
 
 #define bool char
 #define MAX_CHAR 48
@@ -45,6 +46,7 @@ typedef struct {
 // 'member functions'
 void checkHostOS(MetaData *meta);
 void GetWD(MetaData *meta);
+int findInput(MetaData *meta, InputParameters Iparam);
 void meta_displayInfo(MetaData meta);
 void meta_free(MetaData *meta);
 
@@ -83,7 +85,10 @@ int main(int argc, char *argv[]) {
     checkHostOS(&meta);
     GetWD(&meta);
     ParseParameters(Iparam, argc, argv);
-    
+    if(findInput(&meta, *Iparam) == -1){
+        return 1;
+    }
+
     iparam_DisplayInfo(*Iparam);
     meta_displayInfo(meta);
 
@@ -99,15 +104,15 @@ int main(int argc, char *argv[]) {
 
 void callScript(InputParameters Iparam, MetaData meta){
     char command[300];
-    char mainScript[] = "crossx.ps1";
+    char mainScript[] = "C:\\Users\\haydo\\Desktop\\Home_Server\\scripts\\crossOS_compiler\\crossx.ps1";
     size_t charCounter = 0;
     
     // initial command set up
     addSingleQuote(command, charCounter++);
-    strncpy(command + charCounter, meta.proj_dir, strlen(meta.proj_dir));
-    charCounter += strlen(meta.proj_dir);
-    strncpy(command+charCounter++, "\\", 2);
-    strncpy(command+charCounter, mainScript, strlen(mainScript) + 1);
+    // strncpy(command + charCounter, meta.proj_dir, strlen(meta.proj_dir));
+    // charCounter += strlen(meta.proj_dir);
+    // strncpy(command+charCounter++, "\\", 2);
+    strncpy(command+charCounter, mainScript, strlen(mainScript));
     charCounter += strlen(mainScript);
     addSingleQuote(command, charCounter++);
     addComma(command, charCounter++);
@@ -115,7 +120,7 @@ void callScript(InputParameters Iparam, MetaData meta){
 
     // check each param and apply if necessary
 
-    // -wd <path/to/dir>
+    // -OS Windows\Linux\Mac
     if(meta.host_os != NULL){
         char buffer[] = "-OS', ";
         addSingleQuote(command, charCounter++);
@@ -130,13 +135,14 @@ void callScript(InputParameters Iparam, MetaData meta){
         strncpy(command + charCounter, " ", 2);
         charCounter++;
     }
-    if(Iparam.inputFile != NULL){
+    // -wd <path/to/dir>
+    if(meta.wd != NULL){
         char buffer[] = "'-wd', ";
         strncpy(command + charCounter, buffer, strlen(buffer));
         charCounter += strlen(buffer);
         
         addSingleQuote(command, charCounter++);
-        strncpy(command + charCounter, meta.proj_dir, strlen(meta.proj_dir));
+        strncpy(command + charCounter, meta.proj_dir, strlen(meta.proj_dir)+1);
         charCounter += strlen(meta.proj_dir);
         addSingleQuote(command, charCounter++);
         addComma(command, charCounter++);
@@ -152,6 +158,22 @@ void callScript(InputParameters Iparam, MetaData meta){
         addSingleQuote(command, charCounter++);
         strncpy(command + charCounter, Iparam.inputFile, strlen(Iparam.inputFile));
         charCounter += strlen(Iparam.inputFile);
+        addSingleQuote(command, charCounter++);
+        addComma(command, charCounter++);
+        strncpy(command + charCounter, " ", 2);
+        charCounter++;
+    }    
+    else{
+        printf("Error no input file\n");
+    }
+    if(Iparam.language != NULL){
+        char buffer[] = "'-lang ', ";
+        strncpy(command + charCounter, buffer, strlen(buffer));
+        charCounter += strlen(buffer);
+    
+        addSingleQuote(command, charCounter++);
+        strncpy(command + charCounter, Iparam.language, strlen(Iparam.language));
+        charCounter += strlen(Iparam.language);
         addSingleQuote(command, charCounter++);
         addComma(command, charCounter++);
         strncpy(command + charCounter, " ", 2);
@@ -176,20 +198,13 @@ void callScript(InputParameters Iparam, MetaData meta){
             break;
         }
     }
-    // strncpy(bufferCommand + charCounter, suffix, strlen(suffix));
-    // charCounter += strlen(suffix);
-    addNull_Term(bufferCommand, charCounter);
 
+    addNull_Term(bufferCommand, charCounter);
     printf("Full Command: %s\n", bufferCommand);
-    
-    //free(command);
     system(bufferCommand);
-    // system("pause");
     
     return;    
 }
-
-
 void addSpace(char *input, int index){
     strncpy(input + index, " ", 2);
     return;
@@ -289,6 +304,54 @@ void GetWD(MetaData *meta){
 
     return;
 }
+int findInput(MetaData *meta, InputParameters Iparam){
+    // check typical proj_dir and also working directory for input files 
+    char bufPath[90];
+    int charCounter = 0;
+
+    strncpy(bufPath, meta->proj_dir, strlen(meta->proj_dir));
+    charCounter += strlen(meta->proj_dir);
+    strncpy(bufPath + charCounter, "\\", 2);
+    charCounter++;
+    strncpy(bufPath + charCounter, Iparam.inputFile, strlen(Iparam.inputFile));
+    charCounter += strlen(Iparam.inputFile);
+    // addNull_Term(bufPath, charCounter);
+    // LPSTR lpPath = bufPath;
+    char *lpstr = bufPath;
+    if(PathFileExists(lpstr)){
+        printf("File exists in proj_dir");
+        return 1;
+    }
+    else {
+        int nullTerm = 0;
+        bufPath[0] = '\0';
+        charCounter = 0;
+
+        strncpy(bufPath, meta->wd, strlen(meta->wd));
+        charCounter += strlen(meta->wd);
+        nullTerm = charCounter;
+        strncpy(bufPath + charCounter, "\\", 2);
+        charCounter++;
+        strncpy(bufPath + charCounter, Iparam.inputFile, strlen(Iparam.inputFile));
+        charCounter += strlen(Iparam.inputFile);
+        // addNull_Term(bufPath, charCounter);
+        char *lpstr2 = bufPath;
+        if(PathFileExists(lpstr2)){
+            printf("File exists in working directory\n");
+            // update project_directory
+            meta->proj_dir[0] = '\0';
+            bufPath[nullTerm] = '\0';            
+            strncpy(meta->proj_dir, bufPath, strlen(bufPath)+1);
+        }
+        else {
+            printf("Error - No input file found\n");
+            return -1;
+        }
+    }
+    printf("Buffer path: %s\n", meta->proj_dir);
+    
+}
+
 int splitText(char *input, size_t inputLen, char delim, char *output[]){
     size_t numSplits = 0, maxSplits = 30;
 
@@ -305,7 +368,6 @@ int splitText(char *input, size_t inputLen, char delim, char *output[]){
             }
         }
     }
-    
     // printf("PROJECT_DIR: %s\n", output[numSplits-1]);
 
     return numSplits;
