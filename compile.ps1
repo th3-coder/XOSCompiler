@@ -1,4 +1,6 @@
 #compile.ps1
+# fix paths to be input parameters from crossx.exe
+
 class admin {
     [string]$command
     [int]$running = 0
@@ -203,7 +205,7 @@ function cleanPaths {
 function cleanDirectory {
     #fix remote directory
     checkRemotePath -remotePath "$($client.output_dir)/$($compile.ProjectName)"
-    if( $admin.remotePathExists ){
+    if( -not $admin.remotePathExists ){
         $admin.command = ('rm -rf {0}/{1}' -f $client.output_dir, $compile.ProjectName)
         runSSH
     }
@@ -269,7 +271,7 @@ function start_wsl_x11 {
     $admin.command = ('wsl sh -c "{0}"' -f $admin.command)
 }
 function start_srvx_x11 {
-    $Path_srvx = "resources\srvx_X11.xlaunch"
+    $Path_srvx = "$($hostX.proj_dir)\resources\srvx_X11.xlaunch"
     taskkill /IM "vcxsrv.exe" /F
     Start-Process $Path_srvx
     $Env:DISPLAY="localhost:0.0"
@@ -362,3 +364,5 @@ function GetConfigData {
 GetConfigData
 
 RunProcces
+
+Read-Host

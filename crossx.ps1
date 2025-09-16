@@ -12,7 +12,9 @@
 
 param
 (
-    $config = "$(Get-Location)\config_crossx.txt",
+    # fix paths to be input parameters from crossx.exe
+    $OS,
+    $config = "config_crossx.txt",
     $inputFile,
     $language,
     $compiler,
@@ -21,10 +23,14 @@ param
     [int]$srvx_gui = 0,
     [int]$X11,
     [string]$venv,
+    # use to prefix commands to run specific programs such as valgrind from win machine
+    [string]$prefix,
     [string[]]$libs = @()
 )
 
 class host_machine{
+    # fix paths to be input parameters from crossx.exe
+    # change to inherit from param 
     $proj_dir = (Get-Location)
     $user = $Env:USERNAME
     $drive = "C:"
@@ -135,6 +141,18 @@ $ssh = [sshConfig]::new()
 
 #check config file and set as variables for later usage
 function setVariables {
+    if($OS.Length -ne 0){
+        $hostX.OS = $OS
+    }
+    if ($wd.Length -ne 0 ) {
+        if($OS -eq "Windows"){
+            $config = "$wd\$($config)"
+        }
+        elseif ($OS -eq "Linux"){
+            $config = "$wd/$($config)"
+        }
+        $hostX.proj_dir = $wd
+    }
     # get total lines of config
     $content = Get-Content -Path $config
     $totalLines = $content.Count
@@ -207,7 +225,7 @@ function setVariables {
             $hostX.ProjectName = ($lineContent[1]).Trim()
             #Write-Host $hostX.ProjectName
         }
-        elseif($lineContent[0] -eq "HOST_OS"){
+        elseif(($lineContent[0] -eq "HOST_OS") -and ($OS.Length -eq 0)){
             $hostX.OS = ($lineContent[1]).Trim()
             #Write-Host $hostX.OS
         }
@@ -255,4 +273,4 @@ function setVariables {
 setVariables
 $ssh.sendFiles($client, $hostX) 
 $ssh.SSH_SEND_CMD($client, $hostX)
-. ./compile.ps1
+. "$($hostX.proj_dir)\compile.ps1"

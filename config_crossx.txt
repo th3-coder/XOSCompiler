@@ -8,11 +8,11 @@
     # GCC,
     # G++,
     # python,
-    # pip,
-    # wsl (optional), VCXSRV (optional)
+    # pip
 #DEPENDECIES-HOST (create install script for core materials | Each OS)
     # powershell
     # openssh-client
+    # wsl (optional), VCXSRV (optional)
 
 # Host Options
 # PROJECT_NAME MUST BE LOCAL DIR NAME !!! UPDATE
@@ -41,7 +41,7 @@ SSH_KEY: 1
 
 # X11 Forwarding Options
 WSL_X11: 0
-SRVX_X11: 0
+SRVX_X11: 1
 #X11Forwading: 0
 
 # Compiler Configurations
