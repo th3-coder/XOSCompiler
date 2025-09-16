@@ -272,7 +272,7 @@ function start_wsl_x11 {
 }
 function start_srvx_x11 {
     $Path_srvx = "$($hostX.proj_dir)\resources\srvx_X11.xlaunch"
-    taskkill /IM "vcxsrv.exe" /F
+    (taskkill /IM "vcxsrv.exe" /F)
     Start-Process $Path_srvx
     $Env:DISPLAY="localhost:0.0"
     $admin.command = $admin.command -replace "ssh ", "ssh -Y -t "

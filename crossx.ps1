@@ -14,6 +14,7 @@ param
 (
     # fix paths to be input parameters from crossx.exe
     $OS,
+    # ALWAYS keep config(local) in same directory as inputFile !!!!!!
     $config = "config_crossx.txt",
     $inputFile,
     $language,
@@ -144,14 +145,35 @@ function setVariables {
     if($OS.Length -ne 0){
         $hostX.OS = $OS
     }
-    if ($wd.Length -ne 0 ) {
-        if($OS -eq "Windows"){
-            $config = "$wd\$($config)"
+    if ( $wd.Length -ne 0 ) {
+        if( $OS -eq "Windows" ){
+            $buffer = "$wd\$($config)" 
+            if( Test-Path -Path $buffer ){
+                $config = "$wd\$($config)"
+            }
         }
-        elseif ($OS -eq "Linux"){
-            $config = "$wd/$($config)"
+
+
+        elseif ( $OS -eq "Linux" ){
+            $prevPath = $wd -split "\"
+            $buffer
+            for($i = 0, $i -lt $prevPath.Count - 1; $i++){
+
+                $buffer = "$($buffer)\$($prevPath[$i])"
+            }
+            $prevPath = $prevPath
+            if(Test-Path -Path "$($wd)\$($config)"){
+                $config = "$wd/$($config)"
+            }
+            elseif (Test-Path -Path "$($wd)\$($config)"){
+                $config = "$($wd)\$($config)"
+            }
         }
-        $hostX.proj_dir = $wd
+        $hostX.proj_dir = $wd 
+    }
+    else {
+        Write-Host "Error - working directory not found"
+        exit
     }
     # get total lines of config
     $content = Get-Content -Path $config
@@ -273,4 +295,4 @@ function setVariables {
 setVariables
 $ssh.sendFiles($client, $hostX) 
 $ssh.SSH_SEND_CMD($client, $hostX)
-. "$($hostX.proj_dir)\compile.ps1"
+. "C:\Users\haydo\Desktop\Home_Server\scripts\crossOS_compiler\compile.ps1"
