@@ -295,4 +295,4 @@ function setVariables {
 setVariables
 $ssh.sendFiles($client, $hostX) 
 $ssh.SSH_SEND_CMD($client, $hostX)
-. "C:\Users\haydo\Desktop\Home_Server\scripts\crossOS_compiler\src\compile.ps1"
+. "$(Get-Location)\src\compile.ps1"
