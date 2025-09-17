@@ -5,6 +5,8 @@
 *** Keep config_crossx.txt in same directory as inputFile *** 
 * One config file per project directory
 
+Heirarchy: src_dir(src\crossx.ps1, src\compile.ps1, src\crossx.exe), resources_dir(resources\srvx_X11.xlaunch)
+
 Run from project directory
 
 * Options:
@@ -35,7 +37,6 @@ Run from project directory
 
     -venv (python/venv/name) 
 
-Example Usage
-Run from project directory (config, ps1 scripts, and resources must be in project directory for now)
-* ./crossx.exe -input libTest.py -venv  
+Example Usages: Always run crossx.exe from project directory ---> src/crossx.exe -parameters 
+* src\crossx.exe -input libTest.py -venv  
 
