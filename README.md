@@ -15,25 +15,25 @@
 
 ****Options:****
     
-    -input (file)
+    **-input (file)**
 
-    -lang (programmingLanguage) 
+    **-lang (programmingLanguage)** 
 
     * C, C++, Python
 
-    -compiler (compiler)
+    **-compiler (compiler)**
     
     * cmake, gcc, g++
 
-    -libs (lib1) (lib2) ...
+    **-libs (lib1) (lib2) ...**
 
-    -wsl_gui (0 | 1)
+    **-wsl_gui (0 | 1)**
     
     * WSL must be installed
     
-    -srvx_gui (0 | 1)
+    **-srvx_gui (0 | 1)**
     
-    <\t>Recommended:   
+    Recommended:   
     
     * Install VCXSRV (uses configuration file in resources)
     
