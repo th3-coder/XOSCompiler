@@ -5,7 +5,7 @@
 ***Keep config_crossx.txt in same directory as inputFile*** 
 * One config file per project directory
 
-File Heirarchy:
+***File Heirarchy:***
 
 * src_dir(src\crossx.ps1, src\compile.ps1, src\crossx.exe), 
 
@@ -13,9 +13,7 @@ File Heirarchy:
 
 * proj_dir(inputFile, CMakeLists.txt, requirements.txt)
 
-Run from project directory
-
-* Options:
+****Options:****
     
     -input (file)
 
@@ -43,6 +41,6 @@ Run from project directory
 
     -venv (python/venv/name) 
 
-Example Usages: Always run crossx.exe from project directory ---> src/crossx.exe -parameters 
+***Example Usages: Always run crossx.exe from project directory ---> src/crossx.exe -parameters*** 
 * src\crossx.exe -input libTest.py -venv  
 
