@@ -74,9 +74,9 @@ class compileConfig {
         Write-Host "---------------------------------------------"
     }
 
-    [void]update_cmake([string]$inputFile){
+    [void]update_cmake([string]$inputFile, [string]$wd){
         #change CMakeLists.txt file
-        $cmake_path = "CMakeLists.txt"
+        $cmake_path = "$($wd)\CMakeLists.txt"
         $content = Get-Content -Path $cmake_path
         $totalLines = $content.Count
 
@@ -100,7 +100,7 @@ class compileConfig {
         $content | Set-Content -Path $cmake_path
     }
 
-    [void]compile_Buffer([string]$client_wd, [string]$inputFile, [string]$remoteOS, [admin]$admin) {
+    [void]compile_Buffer([string]$client_wd, [string]$inputFile, [string]$remoteOS, [admin]$admin, [string]$wd) {
         # $compile.output_file = ('{0}/{1}' -f $client.output_dir, $inputFile)
         if( $this.lang -eq "C" -or $this.lang -eq "C++"){
             class c_config{
@@ -112,7 +112,7 @@ class compileConfig {
             $config = [c_config]::new()
             if($this.compiler -eq "cmake"){
                 #Write-Host "Hello"
-                $this.update_cmake($inputFile)
+                $this.update_cmake($inputFile, $wd)
                 $this.compile_cmds += ('cd {0}/{1}/build  && cmake ..' -f $client_wd, $this.ProjectName);
                 $this.compile_cmds += ('cd {0}/{1}/build  && make' -f $client_wd, $this.ProjectName);
             }
@@ -314,7 +314,7 @@ function Cleanup {
 function RunProcces {
     #createRunScript
     cleanDirectory # prepare remote preoject directory
-    $compile.compile_Buffer($client.output_dir, $inputFile, $client.OS, $admin)
+    $compile.compile_Buffer($client.output_dir, $inputFile, $client.OS, $admi, $wd)
     $compile.outputInfo()    
     $compile.COMPILE_CMD($admin) #compile project
     run_Program #run output file

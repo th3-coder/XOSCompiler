@@ -33,7 +33,7 @@
 
 **-srvx_gui (0 | 1)**
 
-    Recommended:   
+Recommended:   
     
 * Install VCXSRV (uses configuration file in resources)
 
@@ -42,5 +42,6 @@
 **-venv (python/venv/name)** 
 
 ***Example Usages: Always run crossx.exe from project directory ---> src/crossx.exe -parameters*** 
-* src\crossx.exe -input libTest.py -venv  
+    src\crossx.exe -input libTest.py -venv  
 
+    src\crossx.exe -input filterImg.cpp -compiler cmake -srvx_gui 1

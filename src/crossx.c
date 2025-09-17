@@ -179,6 +179,19 @@ void callScript(InputParameters Iparam, MetaData meta){
         strncpy(command + charCounter, " ", 2);
         charCounter++;
     }
+    if(Iparam.compiler != NULL){
+        char buffer[] = "'-compiler', ";
+        strncpy(command + charCounter, buffer, strlen(buffer));
+        charCounter += strlen(buffer);
+    
+        addSingleQuote(command, charCounter++);
+        strncpy(command + charCounter, Iparam.compiler, strlen(Iparam.compiler));
+        charCounter += strlen(Iparam.compiler);
+        addSingleQuote(command, charCounter++);
+        addComma(command, charCounter++);
+        strncpy(command + charCounter, " ", 2);
+        charCounter++;
+    }
     if(Iparam.venv != NULL){
         char buffer[] = "'-venv', ";
         strncpy(command + charCounter, buffer, strlen(buffer));
