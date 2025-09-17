@@ -2,7 +2,7 @@
 
 # XOSCompiler Prototype
 
-*** Keep config_crossx.txt in same directory as inputFile *** 
+**Keep config_crossx.txt in same directory as inputFile** 
 * One config file per project directory
 
 File Heirarchy:
