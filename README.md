@@ -40,11 +40,36 @@ Recommended:
 * <a href="https://sourceforge.net/projects/vcxsrv/">VCXSRV DOWNLOAD</a>
 
 **-venv (python/venv/name)** 
+* default venv is stored in /home/user (linux)
 
 ***Example Usages: Always run crossx.exe from project directory ---> src/crossx.exe -parameters*** 
 
-    src\crossx.exe -input libTest.py -venv  
+    src\crossx.exe -input libTest.py -venv myVenv 
 
     src\crossx.exe -input filterImg.cpp -compiler cmake -srvx_gui 1
-    <img width="1918" height="1199" alt="image" src="https://github.com/user-attachments/assets/96efc55d-428e-455e-85d3-6982a8f8ef9b" />
+    
+<img width="1918" height="1199" alt="image" src="https://github.com/user-attachments/assets/96efc55d-428e-455e-85d3-6982a8f8ef9b" />
+
+
+***Host Dependecies***
+
+**Windows:**
+
+* openssh-client 
+
+* VCXSRV (optional) - enables X11 Gui forwarding from linux -> windows 
+
+* wsl (optional) - enables X11 Gui forwarding from linux -> windows
+
+***Remote Dependecies***
+
+* openssh-server
+
+* cmake
+
+* g++
+
+* gcc
+
+* python
 
