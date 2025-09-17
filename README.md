@@ -15,31 +15,31 @@
 
 ****Options:****
     
-    **-input (file)**
+**-input (file)**
 
-    **-lang (programmingLanguage)** 
+**-lang (programmingLanguage)** 
 
-    * C, C++, Python
+* C, C++, Python
 
-    **-compiler (compiler)**
-    
-    * cmake, gcc, g++
+**-compiler (compiler)**
 
-    **-libs (lib1) (lib2) ...**
+* cmake, gcc, g++
 
-    **-wsl_gui (0 | 1)**
-    
-    * WSL must be installed
-    
-    **-srvx_gui (0 | 1)**
-    
+**-libs (lib1) (lib2) ...**
+
+**-wsl_gui (0 | 1)**
+
+* WSL must be installed
+
+**-srvx_gui (0 | 1)**
+
     Recommended:   
     
-    * Install VCXSRV (uses configuration file in resources)
-    
-    * <a href="https://sourceforge.net/projects/vcxsrv/">VCXSRV DOWNLOAD</a>
+* Install VCXSRV (uses configuration file in resources)
 
-    -venv (python/venv/name) 
+* <a href="https://sourceforge.net/projects/vcxsrv/">VCXSRV DOWNLOAD</a>
+
+**-venv (python/venv/name)** 
 
 ***Example Usages: Always run crossx.exe from project directory ---> src/crossx.exe -parameters*** 
 * src\crossx.exe -input libTest.py -venv  
