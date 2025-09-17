@@ -5,7 +5,7 @@
 *** Keep config_crossx.txt in same directory as inputFile *** 
 * One config file per project directory
 
-Heirarchy: src_dir(src\crossx.ps1, src\compile.ps1, src\crossx.exe), resources_dir(resources\srvx_X11.xlaunch)
+Heirarchy: src_dir(src\crossx.ps1, src\compile.ps1, src\crossx.exe), resources_dir(resources\srvx_X11.xlaunch, resources/anyResourceUsed by input file), proj_dir(inputFile, CMakeLists.txt, requirements.txt)
 
 Run from project directory
 
