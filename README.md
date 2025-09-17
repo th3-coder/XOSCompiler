@@ -42,6 +42,7 @@ Recommended:
 **-venv (python/venv/name)** 
 
 ***Example Usages: Always run crossx.exe from project directory ---> src/crossx.exe -parameters*** 
+
     src\crossx.exe -input libTest.py -venv  
 
     src\crossx.exe -input filterImg.cpp -compiler cmake -srvx_gui 1
