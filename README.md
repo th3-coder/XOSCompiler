@@ -26,9 +26,13 @@ Run from project directory
     * WSL must be installed
     
     -srvx_gui (0 | 1)
-     Recommended:   
+    
+    Recommended:   
+    
     * Install VCXSRV (uses configuration file in resources)
-    * <href="https://sourceforge.net/projects/vcxsrv/", link>
+    
+    * <a href="https://sourceforge.net/projects/vcxsrv/">VCXSRV DOWNLOAD</a>
+
     -venv (python/venv/name) 
 
 Example Usage
