@@ -27,11 +27,11 @@ Run from project directory
     
     -srvx_gui (0 | 1)
     
-    Recommended:   
-    
-    * Install VCXSRV (uses configuration file in resources)
-    
-    * <a href="https://sourceforge.net/projects/vcxsrv/">VCXSRV DOWNLOAD</a>
+        Recommended:   
+        
+        * Install VCXSRV (uses configuration file in resources)
+        
+        * <a href="https://sourceforge.net/projects/vcxsrv/">VCXSRV DOWNLOAD</a>
 
     -venv (python/venv/name) 
 
