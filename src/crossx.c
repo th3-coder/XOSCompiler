@@ -104,9 +104,9 @@ int main(int argc, char *argv[]) {
 
 void callScript(InputParameters Iparam, MetaData meta){
     char command[300];
-    char mainScript[] = "C:\\Users\\haydo\\Desktop\\Home_Server\\scripts\\crossOS_compiler\\crossx.ps1";
+    char mainScript[] = "C:\\Users\\haydo\\Desktop\\Home_Server\\scripts\\crossOS_compiler\\src\\crossx.ps1";
     size_t charCounter = 0;
-    
+
     // initial command set up
     addSingleQuote(command, charCounter++);
     // strncpy(command + charCounter, meta.proj_dir, strlen(meta.proj_dir));
@@ -167,13 +167,26 @@ void callScript(InputParameters Iparam, MetaData meta){
         printf("Error no input file\n");
     }
     if(Iparam.language != NULL){
-        char buffer[] = "'-lang ', ";
+        char buffer[] = "'-lang', ";
         strncpy(command + charCounter, buffer, strlen(buffer));
         charCounter += strlen(buffer);
     
         addSingleQuote(command, charCounter++);
         strncpy(command + charCounter, Iparam.language, strlen(Iparam.language));
         charCounter += strlen(Iparam.language);
+        addSingleQuote(command, charCounter++);
+        addComma(command, charCounter++);
+        strncpy(command + charCounter, " ", 2);
+        charCounter++;
+    }
+    if(Iparam.venv != NULL){
+        char buffer[] = "'-venv', ";
+        strncpy(command + charCounter, buffer, strlen(buffer));
+        charCounter += strlen(buffer);
+    
+        addSingleQuote(command, charCounter++);
+        strncpy(command + charCounter, Iparam.venv, strlen(Iparam.venv));
+        charCounter += strlen(Iparam.venv);
         addSingleQuote(command, charCounter++);
         addComma(command, charCounter++);
         strncpy(command + charCounter, " ", 2);

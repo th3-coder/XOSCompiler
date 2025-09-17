@@ -6,9 +6,10 @@
 * One config file per project directory
 
 Run from project directory
+
 * Options:
     
-    -inputFile (file)
+    -input (file)
 
     -lang (programmingLanguage) 
 
@@ -25,7 +26,12 @@ Run from project directory
     * WSL must be installed
     
     -srvx_gui (0 | 1)
-    
+     Recommended:   
     * Install VCXSRV (uses configuration file in resources)
-    
-    -venv (python/venv/name)
+    * <href="https://sourceforge.net/projects/vcxsrv/", link>
+    -venv (python/venv/name) 
+
+Example Usage
+Run from project directory (config, ps1 scripts, and resources must be in project directory for now)
+* ./crossx.exe -input libTest.py -venv  
+
