@@ -58,6 +58,8 @@ Recommended:
 
 * openssh-client 
 
+* powershell
+
 * VCXSRV (optional) - enables X11 Gui forwarding from linux -> windows 
 
 * wsl (optional) - enables X11 Gui forwarding from linux -> windows
