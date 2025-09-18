@@ -3,6 +3,8 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
+// linux specific directories 
+
 #include <cstring>
 #include <iostream>
 

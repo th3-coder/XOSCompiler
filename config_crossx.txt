@@ -2,6 +2,9 @@
 # save config file <projName>_CrossX for later use
 # 1 config file per project
 
+#DEFAULT SETTINGS
+# CAN BE CHANGED WITH INPUT PARAMETERS
+
 #DEPENDECIES-REMOTE (create install script for core materials | Each OS)
     # openssh-server, 
     # cmake,
@@ -16,7 +19,7 @@
 
 # Host Options
 # PROJECT_NAME MUST BE LOCAL DIR NAME !!! UPDATE
-PROJECT_NAME: crossOS_compiler
+PROJECT_NAME: xos_compiler
 PROJECTS_DIR: \Users\haydo\Desktop\Home_Server\crossOS_compiler\
 #HOST_OS: Windows
 # CONFIG_PATH IS RELATIVE TO PROJECT_DIR (if left empty then in root project directory)

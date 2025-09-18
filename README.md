@@ -2,6 +2,14 @@
 
 # XOSCompiler Prototype
 
+***Build from source***
+
+    git clone https://github.com/th3-coder/XOSCompiler
+
+    cd XOSCompiler\src
+
+    gcc crossx.c --static -o xos.exe -lShlwapi
+
 ***Keep config_crossx.txt in same directory as inputFile*** 
 * One config file per project directory
 * Update config file for set parameters (when calling function with parameters this will overwrite any config parameters)

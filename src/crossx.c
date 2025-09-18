@@ -103,15 +103,14 @@ int main(int argc, char *argv[]) {
 }
 
 void callScript(InputParameters Iparam, MetaData meta){
-    char command[300], mainScript[75];
-    char mainScriptName[] = "crossx.ps1";
+    char command[300], mainScript[90];
+    char mainScriptName[] = "\\src\\crossx.ps1";
     
     size_t charCounter = 0;
 
     strncpy(mainScript, meta.wd, strlen(meta.wd));
     charCounter += strlen(meta.wd);
     strncpy(mainScript + charCounter, mainScriptName, strlen(mainScriptName));
-    charCounter += strlen(mainScriptName);
 
     charCounter = 0;
 
